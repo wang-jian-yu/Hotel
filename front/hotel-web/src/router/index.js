@@ -3,19 +3,20 @@ import VueRouter from "vue-router";
 import Element from "element-ui";
 Vue.use(VueRouter);
 
-
 const routes = [
+  { path: "/", redirect: "/login" },
   {
-    path: '/',
-    name: 'Layout',
-    component: () => import('../pages/layout')
+    path: "/home",
+    component: () => import("../pages/home/Home"),
+    redirect: 'welcome',
+    children: [
+      { path: "/welcome", component: () => import("../pages/welcome/Welcome") },
+    ],
   },
   {
     path: "/login",
-    name: "Login",
-    component: () => import('../pages/login/Login')
+    component: () => import("../pages/login/Login"),
   },
-
   // {
   //   path: '/about',
   //   name: 'About',
@@ -26,7 +27,6 @@ const routes = [
   // }
 ];
 
-
 const router = new VueRouter({
   routes,
 });
@@ -34,7 +34,8 @@ const router = new VueRouter({
 //路由拦截守卫
 router.beforeEach((to, from, next) => {
   //如果访问登录页、注册页放行
-  if (to.path === "/login" || to.path === "regiest") return next();
+  if (to.path === "/login" || to.path === "/" || to.path === "regiest")
+    return next();
 
   //没有token跳转登录页
   const tokenStr = window.sessionStorage.getItem("token");
@@ -43,10 +44,8 @@ router.beforeEach((to, from, next) => {
     Element.Message({ type: "error", message: "请先登陆" });
     return next("/login");
   }
-  return next()
+  return next();
 });
-
-
 
 // import store from "../store/index";
 // router.beforeEach((to, from, next) => {
